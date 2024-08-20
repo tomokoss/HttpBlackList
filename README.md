@@ -23,7 +23,10 @@
         script.src = url;
         script.onload = function() {
             if (window.blockedUrls && Array.isArray(window.blockedUrls)) {
-                callback(window.blockedUrls);
+                // 检查是否需要重定向
+                if (shouldRedirect()) {
+                    redirectToBlockedPage();
+                }
             } else {
                 console.error('blockedUrls not defined in the loaded script.');
             }
@@ -37,25 +40,27 @@
     // 远程屏蔽列表URL
     var remoteListUrl = 'https://qipantanyi.github.io/HttpBlackList/blocklist.js';
     loadScript(remoteListUrl, function(blockedUrls) {
-        // 使用获取到的blockedUrls进行检查
-        checkAndBlockSites(blockedUrls);
+        // 这里不需要执行任何操作，因为检查已经在script.onload中完成
     });
 
-    // 检查并屏蔽网站
-    function checkAndBlockSites(blockedUrls) {
-        for (var i = 0; i < blockedUrls.length; i++) {
-            var blockedUrl = new URL(blockedUrls[i]);
-            if (location.host === blockedUrl.host && location.pathname.startsWith(blockedUrl.pathname)) {
-                alert('访问的网站被屏蔽！');
-                redirectToBlockedPage(); // 重定向到被屏蔽的页面
-                return;
-            }
-        }
+    // 检查当前访问的网站是否在屏蔽列表中
+    function shouldRedirect() {
+        var blockedHostnames = window.blockedUrls.map(function(url) {
+            return new URL(url).hostname;
+        });
+        return blockedHostnames.includes(location.hostname);
     }
 
     // 重定向到被屏蔽的页面
     function redirectToBlockedPage() {
         window.location.href = 'https://qipantanyi.github.io/HttpBlackList/access-denied.html';
+    }
+
+    // 立即执行一次检查，如果需要重定向，则显示警告并重定向
+    if (window.blockedUrls && Array.isArray(window.blockedUrls)) {
+        if (shouldRedirect()) {
+            alert('访问的网站被屏蔽！');
+        }
     }
 })();
 ```
