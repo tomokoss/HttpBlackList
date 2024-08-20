@@ -1,6 +1,6 @@
 // blocklist.js
-export const blockedUrls = [
-    "https://chat18.aichatos.xyz/",
-    "https://kimi.moonshot.cn/",
-    // ... 其他需要屏蔽的网站
+window.blockedUrls = [
+    "https://www.bilibili.com/",
+    "https://www.zhihu.com/",
+    // ...其他需要屏蔽的网站
 ];
